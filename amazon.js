@@ -9,29 +9,32 @@ var connection = mysql.createConnection({
   database: "bamazon_db"
 });
 
-
 connection.connect();
 
 
     connection.query("SELECT * FROM products", function(err, res) {
       if (err) throw err;
       console.log(res);
-    });
-
-
-      
-    inquirer.prompt([{
+      inquirer.prompt([{
         type: 'list',
         name: 'option',
         message: "What type of product would you like to buy?",
-        choices:["Yes", "No"]
-     }
-    ]).then(function (response){
-       console.log(response.choices)
+        choices:[""]
+      }
+      ]).then(function (response){
+       console.log(response)
+       inquirer.prompt([{
+        type: 'list',
+        name: 'option',
+        message: "How much would you like to buy?",
+        choices:[""]
+      }
+      ]).then(function (response){
+       console.log(response)
+      });
+      });
+      
     });
-
-  
-
 
     connection.end();
 
