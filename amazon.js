@@ -12,31 +12,36 @@ var connection = mysql.createConnection({
 connection.connect();
 
 
-    connection.query("SELECT * FROM products", function(err, res) {
+connection.query("SELECT * FROM products", function (err, response) {
+  if (err) throw err;
+  console.log(response);
+  inquirer.prompt([{
+    type: 'input',
+    name: 'option',
+    message: "What type of product would you like to buy?"
+     
+  }
+  ]).then(function (response) {
+    console.log(response)
+    connection.query("SELECT * FROM products WHERE product_name =?", response.option, function (err, result) {
       if (err) throw err;
-      console.log(res);
-      inquirer.prompt([{
-        type: 'list',
-        name: 'option',
-        message: "What type of product would you like to buy?",
-        choices:[""]
+      console.log(result);
+      // var choice = result.options;
+      console.log(result[0].stock_quantity);
+
+      if(result[0].stock_quantity <= 0) {
+        
+        console.log("insuffient funds!");
+      } else {
+        console.log("not working");
       }
-      ]).then(function (response){
-       console.log(response)
-       inquirer.prompt([{
-        type: 'list',
-        name: 'option',
-        message: "How much would you like to buy?",
-        choices:[""]
-      }
-      ]).then(function (response){
-       console.log(response)
-      });
-      });
-      
-    });
-
-    connection.end();
+    
+    })
 
 
-  
+});
+})
+
+// connection.end();
+
+
