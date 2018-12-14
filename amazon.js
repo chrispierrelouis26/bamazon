@@ -10,7 +10,10 @@ var connection = mysql.createConnection({
   database: "bamazon_db"
 });
 
-connection.connect();
+connection.connect(function (err){
+  if (err) throw err;
+  
+});
 
 
 connection.query("SELECT * FROM products", function (err, response) {
@@ -29,16 +32,14 @@ connection.query("SELECT * FROM products", function (err, response) {
     message: "How many units would you like to buy?"
   }
   ]).then(function (response) {
-    console.log(response)
-    connection.query("SELECT * FROM products WHERE id =?", response.option, function (err, result) {
+    connection.query("SELECT * FROM products WHERE product_name =?",[ response.option], function (err, result) {
       if (err) throw err;
-     
-      console.log(result[0].stock_quantity);
 
-      if (result[0].stock_quantity <= 0) {
+
+      if (response.input >result[0].stock_quantity) {
 
         console.log("insuffient funds!");
-      } else {
+      } else if(response.input >result[0].stock_quantity) {
         console.log("not working");
       }
 
