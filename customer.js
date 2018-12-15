@@ -15,49 +15,53 @@ connection.connect(function (err) {
     start();
 });
 
-function start(){
+function start() {
     inquirer.prompt([
         {
             type: "list",
             name: "customerPick",
             message: "Would you like to look or buy?",
-            choices: ["I'd like to look first!", "I'm ready to make a purchase"]
+            choices: ["Lets take a look!", "Ok ok i'm ready to buy!"]
         },
-    ]).then(function(customerResponse){
+    ]).then(function (customerResponse) {
         var customerPick = customerResponse.customerPick;
-        if(customerPick ==="I'd like to look first!"){
-            connection.query("SELECT * FROM products;", function(err, res){
+        if (customerPick === "Lets take a look!") {
+            connection.query("SELECT * FROM products;", function (err, res) {
                 console.table(res);
                 start();
             });
-        } else if (customerPick === "I'm ready to make a purchase"){
+        } else if (customerPick === "Ok ok i'm ready to buy!") {
             inquirer.prompt([
                 {
                     name: "idInput",
                     message: "What is the item ID youd like to purchase?",
-                    validate: function validateidInput(name){
+                    validate: function validateidInput(name) {
                         return name !== '';
                     }
                 },
                 {
                     name: "customer",
                     message: "How much would you like to purchase?",
-                    validate: function validatecustomer(name){
+                    validate: function validatecustomer(name) {
                         return name !== '';
+
                     }
                 }
-            ]).then(function(answer){
-                connection.query("SELECT stock_quantity FROM products WHERE item_id= ?", [answer.idInput],function(err, res){
-                    if (answer.customer > res[0].stock_quantity){
+            ]).then(function (answer) {
+                connection.query("SELECT stock_quantity FROM products WHERE item_id= ?", [answer.idInput], function (err, res) {
+
+                    if (answer.customer < res[0].stock_quantity) {
                         console.log("Insufficient quantity!");
                         start();
-                    } else if (answer.customer <= res[0].stock_quantity){
+                    } else if (answer.customer <= res[0].stock_quantity) {
                         console.log("Your order has been placed, Thank you come again!");
-                        connection.query("UPDATE products SET stock_quantity = ? WHERE item_id = ?", [(res[0].stock_quantity - answer.customer),answer.idInput], function(err, res){
+                        connection.query("UPDATE products SET stock_quantity = ? WHERE item_id = ?", [(res[0].stock_quantity - answer.customer), answer.idInput], function (err, res) {
                             connection.end();
                         })
-                    }   
+                    }
+
                 })
+
             })
         }
     })
